@@ -8,6 +8,7 @@ import * as redis from "@midwayjs/redis";
 import * as prometheus from "@midwayjs/prometheus";
 import * as axios from "@midwayjs/axios";
 import * as bull from "@midwayjs/bull";
+import * as grpc from "@midwayjs/grpc";
 import { join } from "path";
 import { DefaultErrorFilter } from "./filter/default.filter";
 import { NotFoundFilter } from "./filter/notfound.filter";
@@ -26,6 +27,7 @@ import { ValidateErrorFilter } from "./filter/validate.filter";
     prometheus,
     axios,
     bull,
+    grpc,
     {
       component: info,
       enabledEnvironment: ["local"]

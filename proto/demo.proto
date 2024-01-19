@@ -1,0 +1,34 @@
+syntax = "proto3";
+package protocol;
+
+option java_multiple_files = true;
+
+option java_package = "demo.grpc.api";
+option java_outer_classname = "DemoGrpcAPI";
+
+
+
+service DemoService {
+  rpc get(DemoGetRequest) returns (DemoGetResponse);
+
+  rpc create(DemoCreateRequest) returns (DemoCreateResponse);
+}
+
+message DemoGetRequest {
+  int32 id = 1;
+}
+
+message DemoGetResponse {
+  int32 id = 1;
+  string name = 2;
+  int32 gender = 3;
+}
+
+message DemoCreateRequest {
+  string name = 1;
+  int32 gender = 2;
+}
+
+message DemoCreateResponse {
+  int32 id = 1;
+}
