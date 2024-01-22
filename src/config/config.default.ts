@@ -110,13 +110,17 @@ export default (appInfo: MidwayAppInfo): MidwayConfig => {
     },
     // http请求
     axios: {
+      default: {
+        // 所有实例复用的配置
+        timeout: 3000, // default is `0` (no timeout)
+        // `withCredentials` indicates whether or not cross-site Access-Control requests
+        // should be made using credentials
+        withCredentials: false // default
+      },
       clients: {
         default: {
-          timeout: 3000, // default is `0` (no timeout)
-
-          // `withCredentials` indicates whether or not cross-site Access-Control requests
-          // should be made using credentials
-          withCredentials: false // default
+          // `headers` are custom headers to be sent
+          headers: {}
         },
         // 自定义实例，可以配置多个
         tronAxios: {
@@ -153,13 +157,39 @@ export default (appInfo: MidwayAppInfo): MidwayConfig => {
     // grpc
     grpcServer: {
       // 定义grpc的请求地址和端口
-      url: "192.168.1.3:7701",
+      url: "192.168.1.55:7701",
       services: [
         {
           protoPath: join(appInfo.appDir, "proto/demo.proto"),
           package: "protocol"
         }
       ]
+    },
+    // consul
+    consul: {
+      provider: {
+        // 注册本服务
+        register: true,
+        // 应用正常下线反注册
+        deregister: true,
+        // consul server 服务地址
+        host: "192.168.1.55",
+        // consul server 服务端口
+        port: "8500",
+        // 调用服务的策略(默认选取 random 具有随机性)
+        strategy: "random"
+      },
+      service: {
+        // 此处是当前这个 midway 应用的地址
+        address: "192.168.1.55",
+        // 当前 midway 应用的端口
+        port: 7001,
+        // 做泳道隔离等使用
+        tags: ["tag1", "tag2"],
+        // 名称
+        name: "midway-demo"
+        // others consul service definition
+      }
     }
   };
 }

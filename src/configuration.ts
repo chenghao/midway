@@ -9,6 +9,7 @@ import * as prometheus from "@midwayjs/prometheus";
 import * as axios from "@midwayjs/axios";
 import * as bull from "@midwayjs/bull";
 import * as grpc from "@midwayjs/grpc";
+import * as consul from "@midwayjs/consul";
 import { join } from "path";
 import { DefaultErrorFilter } from "./filter/default.filter";
 import { NotFoundFilter } from "./filter/notfound.filter";
@@ -28,6 +29,7 @@ import { ValidateErrorFilter } from "./filter/validate.filter";
     axios,
     bull,
     grpc,
+    consul,
     {
       component: info,
       enabledEnvironment: ["local"]
