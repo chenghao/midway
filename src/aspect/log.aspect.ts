@@ -1,11 +1,12 @@
 import { Aspect, IMethodAspect, Inject, JoinPoint } from "@midwayjs/core";
-import { APIController } from "../controller/api.controller";
-import { TestController } from "../controller/test.controller";
 import { ILogger } from "@midwayjs/logger";
 import { Context } from "@midwayjs/koa";
+import { APIController } from "../controller/api.controller";
+import { TestController } from "../controller/test.controller";
 import { TronController } from "../controller/tron.controller";
+import { ConsulController } from "../controller/consul.controller";
 
-@Aspect([APIController, TestController, TronController])
+@Aspect([APIController, TestController, TronController, ConsulController])
 export class LogAspect implements IMethodAspect {
 
   @Inject()

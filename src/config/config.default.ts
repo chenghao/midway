@@ -180,6 +180,8 @@ export default (appInfo: MidwayAppInfo): MidwayConfig => {
         strategy: "random"
       },
       service: {
+        // 项目注册到consul的id，默认是 name:address:port
+        // id: "",
         // 此处是当前这个 midway 应用的地址
         address: "192.168.1.55",
         // 当前 midway 应用的端口
