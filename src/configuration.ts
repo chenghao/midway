@@ -1,4 +1,5 @@
-import { App, Configuration, ILifeCycle } from "@midwayjs/core";
+import { App, Configuration, ILifeCycle, Logger } from "@midwayjs/core";
+import { ILogger } from "@midwayjs/logger";
 import * as koa from "@midwayjs/koa";
 import * as validate from "@midwayjs/validate";
 import * as info from "@midwayjs/info";
@@ -41,6 +42,11 @@ export class MainConfiguration implements ILifeCycle {
   @App("koa")
   app: koa.Application;
 
+  // 业务应用级别的日志记录，使用 @Logger()
+  // 组件或者框架层面的研发中，我们会使用 coreLogger 来记录日志，使用 @Logger('coreLogger')
+  @Logger()
+  logger: ILogger;
+
   /**
    * 在依赖注入容器 ready 的时候执行
    */
@@ -63,13 +69,13 @@ export class MainConfiguration implements ILifeCycle {
    * 在应用服务启动后执行
    */
   async onServerReady() {
-    console.log("onServerReady: 项目启动完成。");
+    this.logger.info("onServerReady: 项目启动完成。");
   }
 
   /**
    * 在应用停止的时候执行
    */
   async onStop() {
-    console.log("onStop: 项目关闭结束。");
+    this.logger.info("onStop: 项目关闭结束。");
   }
 }

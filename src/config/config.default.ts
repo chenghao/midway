@@ -1,6 +1,7 @@
 import { MidwayAppInfo, MidwayConfig } from "@midwayjs/core";
 import { join } from "path";
-
+import { LoggerInfo } from "@midwayjs/logger";
+import { getCurrentDateStr } from "../interface";
 
 export default (appInfo: MidwayAppInfo): MidwayConfig => {
   return {
@@ -10,7 +11,7 @@ export default (appInfo: MidwayAppInfo): MidwayConfig => {
       //自定义配置上下文日志
       contextLoggerFormat: info => {
         const ctx = info.ctx;
-        return `${info.timestamp} ${info.LEVEL} [${ctx.ip}] [${ctx.path} ${ctx.method}] ${Date.now() - ctx.startTime}ms -- ${info.message}`;
+        return `${getCurrentDateStr()} ${info.LEVEL} [${ctx.ip}] [${ctx.path} ${ctx.method}] ${Date.now() - ctx.startTime}ms -- ${info.message}`;
       }
     },
     // 跨域配置
@@ -63,6 +64,10 @@ export default (appInfo: MidwayAppInfo): MidwayConfig => {
     midwayLogger: {
       default: {
         level: "info",
+        format: (info: LoggerInfo) => {
+          return `${getCurrentDateStr()} ${info.LEVEL} ${info.pid} -- ${info.message}`;
+        },
+        contextLoggerFormat: {},
         transports: {
           file: {
             dir: `/home/logs/midway-demo`,
@@ -152,6 +157,10 @@ export default (appInfo: MidwayAppInfo): MidwayConfig => {
           commandTimeout: 10000,
           connectTimeout: 10000
         }
+      },
+      contextLoggerFormat: info => {
+        const { jobId, from } = info.ctx;
+        return `${getCurrentDateStr()} ${info.LEVEL} ${info.pid} [${jobId} ${from.name}] -- ${info.message}`;
       }
     },
     // grpc

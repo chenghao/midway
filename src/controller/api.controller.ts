@@ -45,13 +45,13 @@ export class APIController {
     const pickTestReq: PickTestReq = new PickTestReq();
     pickTestReq.firstName = "aaa";
     pickTestReq.lastName = "bbb";
-    this.ctx.logger.info(`pickTestReq: ${JSON.stringify(pickTestReq)}`);
+    this.ctx.logger.info("pickTestReq: %j", pickTestReq);
 
     const omitTestReq: OmitTestReq = new OmitTestReq();
     omitTestReq.id = 2;
     omitTestReq.firstName = "sss";
     omitTestReq.lastName = "wsx";
-    this.ctx.logger.info(`omitTestReq: ${JSON.stringify(omitTestReq)}`);
+    this.ctx.logger.info("omitTestReq: %j", omitTestReq);
   }
 
   @Get("/typeorm/getTest1")

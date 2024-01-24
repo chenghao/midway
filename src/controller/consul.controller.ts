@@ -1,4 +1,4 @@
-import { Controller, Get, HttpStatus, Inject, InjectClient, Query } from "@midwayjs/core";
+import { Controller, Get, HttpStatus, Inject, InjectClient, MidwayError, Query } from "@midwayjs/core";
 import { BalancerService } from "@midwayjs/consul";
 import { Context } from "@midwayjs/koa";
 import * as Consul from "consul";
@@ -23,9 +23,8 @@ export class ConsulController {
     // passingOnly=true  只查询健康的服务， 默认是true (可不传该参数)
     // passingOnly=false 只查询不健康的服务
     const service = await this.balancerService.getServiceBalancer().select(serviceName, true);
-    this.ctx.logger.info("service: %j", service);
     if (!service) {
-      throw new Error("获取consul服务失败");
+      throw new MidwayError("获取consul服务失败");
     }
 
     // 我们可以通过 ServiceAddress 和 ServicePort 去连接目标服务，比如做http请求等
@@ -42,30 +41,18 @@ export class ConsulController {
   @Get("/consul/setKey")
   async setKey(@Query("key") key: string, @Query("value") value: string) {
     // 设置成功时返回 true
-    const res = await this.consul.kv.set(key, value);
-
-    this.ctx.logger.info(res);
-
-    return res;
+    return await this.consul.kv.set(key, value);
   }
 
   @Get("/consul/getKey")
   async getKey(@Query("key") key: string) {
     // 获取value, 如果key不存在返回 undefined
-    const res = await this.consul.kv.get(key);
-
-    this.ctx.logger.info(res);
-
-    return res === undefined ? {} : res;
+    return await this.consul.kv.get(key);
   }
 
   @Get("/consul/delKey")
   async delKey(@Query("key") key: string) {
-    const res = await this.consul.kv.del(key);
-
-    this.ctx.logger.info(res);
-
-    return res;
+    return await this.consul.kv.del(key);
   }
 
   /**
@@ -78,12 +65,13 @@ export class ConsulController {
     this.ctx.logger.info("service: %j", service);
 
     if (!service) {
-      throw new Error("获取consul服务失败");
+      throw new MidwayError("获取consul服务失败");
     }
 
     let serviceID = service.ServiceID;
+    this.ctx.logger.info("serviceID: %s", serviceID);
 
-    await this.consul.agent.service.deregister(serviceID);
+    return await this.consul.agent.service.deregister(serviceID);
   }
 
   /**
@@ -97,7 +85,7 @@ export class ConsulController {
     let consulConfig = this.ctx.app.getConfig("consul");
     this.ctx.logger.info("consulConfig: %j", consulConfig);
 
-    await this.consul.agent.service.register(consulConfig.service);
+    return await this.consul.agent.service.register(consulConfig.service);
   }
 
   /**
@@ -105,10 +93,7 @@ export class ConsulController {
    */
   @Get("/consul/list")
   async list() {
-    let res = await this.consul.agent.service.list();
-    this.ctx.logger.info(res);
-
-    return res;
+    return await this.consul.agent.service.list();
   }
 
   // 请求consul服务接口
@@ -118,7 +103,7 @@ export class ConsulController {
     this.ctx.logger.info("service: %j", service);
 
     if (!service) {
-      throw new Error("获取consul服务失败");
+      throw new MidwayError("获取consul服务失败");
     }
 
     let serviceAddress: string = service.ServiceAddress;
@@ -131,7 +116,7 @@ export class ConsulController {
     if (result.status === HttpStatus.OK.valueOf()) {
       return result.data;
     } else {
-      new Error("请求失败");
+      throw new MidwayError("请求失败");
     }
   }
 }

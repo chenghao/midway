@@ -1,4 +1,4 @@
-import { HttpStatus, Inject, InjectClient, Provide } from "@midwayjs/core";
+import { HttpStatus, Inject, InjectClient, MidwayError, Provide } from "@midwayjs/core";
 import { HttpService, HttpServiceFactory } from "@midwayjs/axios";
 import { Context } from "@midwayjs/koa";
 
@@ -16,7 +16,7 @@ export class TronService {
     if (result.status === HttpStatus.OK.valueOf()) {
       return result.data;
     } else {
-      new Error("请求失败");
+      throw new MidwayError("请求失败");
     }
   }
 }
