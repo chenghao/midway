@@ -15,23 +15,56 @@ export async function getRandomUUID() {
   return uuid.replaceAll("-", "");
 }
 
+/**
+ * 获取随机数字
+ * @param min
+ * @param max
+ */
 export async function getRandomNumber(min?: number, max?: number) {
-  if (!min) {
-    min = 100000;
-  }
-  if (!max) {
-    max = 999999;
-  }
   const range = max - min; // 取值范围差
   const random = Math.random(); // 小于1的随机数
   return min + Math.round(random * range); // 最小数加随机范围差
 }
 
 /**
+ * 获取随机的 traceId, 10位数
+ * @param min
+ * @param max
+ */
+export async function getTraceId(min?: number, max?: number) {
+  if (!min) {
+    min = 1000000000;
+  }
+  if (!max) {
+    max = 9999999999;
+  }
+  return getRandomNumber(min, max);
+}
+
+/**
+ * 获取随机的 spanId, 6位数
+ * @param min
+ * @param max
+ */
+export async function getSpanId(min?: number, max?: number) {
+  if (!min) {
+    min = 100000;
+  }
+  if (!max) {
+    max = 999999;
+  }
+  return getRandomNumber(min, max);
+}
+
+/**
  * 获取当前日期
  * 格式化后的日期
  */
-export function getCurrentDateStr() {
+export async function getCurrentDateStr() {
+  return dayjs().tz("Asia/Shanghai").format("YYYY-MM-DD HH:mm:ss.SSS");
+}
+
+export function getCurrentDateStrSync() {
   return dayjs().tz("Asia/Shanghai").format("YYYY-MM-DD HH:mm:ss.SSS");
 }
 

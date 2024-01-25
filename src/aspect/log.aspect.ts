@@ -2,12 +2,11 @@ import { Aspect, IMethodAspect, Inject, JoinPoint } from "@midwayjs/core";
 import { ILogger } from "@midwayjs/logger";
 import { Context } from "@midwayjs/koa";
 import { APIController } from "../controller/api.controller";
-import { TestController } from "../controller/test.controller";
 import { TronController } from "../controller/tron.controller";
 import { ConsulController } from "../controller/consul.controller";
-import { getRandomNumber, getRandomUUID } from "../interface";
+import { getSpanId, getTraceId } from "../interface";
 
-@Aspect([APIController, TestController, TronController, ConsulController])
+@Aspect([APIController, TronController, ConsulController])
 export class LogAspect implements IMethodAspect {
 
   @Inject()
@@ -22,10 +21,10 @@ export class LogAspect implements IMethodAspect {
     let ctx: Context = point.target.ctx;
     if (ctx) {
       if (!ctx.request.header.traceid) {
-        ctx.request.header.traceid = await getRandomUUID();
+        ctx.request.header.traceid = (await getTraceId()) + "";
       }
       if (!ctx.spanid) {
-        ctx.spanid = await getRandomNumber();
+        ctx.spanid = await getSpanId();
       }
 
       if (["GET", "get"].includes(ctx.method)) {

@@ -20,8 +20,7 @@ export class Test1Service {
     let builder: SelectQueryBuilder<Test1Entity> = this.test1Repository.createQueryBuilder("test1")
       .skip((page - 1) * size)
       .take(size)
-      .orderBy("test1.id", "DESC")
-      .printSql();
+      .orderBy("test1.id", "DESC");
     if (id) {
       builder
         .where("test1.id=:id")

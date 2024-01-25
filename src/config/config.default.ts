@@ -1,7 +1,7 @@
 import { MidwayAppInfo, MidwayConfig } from "@midwayjs/core";
 import { join } from "path";
 import { LoggerInfo } from "@midwayjs/logger";
-import { getCurrentDateStr } from "../interface";
+import { getCurrentDateStrSync } from "../interface";
 
 export default (appInfo: MidwayAppInfo): MidwayConfig => {
   return {
@@ -11,9 +11,11 @@ export default (appInfo: MidwayAppInfo): MidwayConfig => {
       //自定义配置上下文日志
       contextLoggerFormat: info => {
         const ctx = info.ctx;
+        // 处理ip, 只取ip4
         let ip = ctx.ip;
         ip = ip.substring(ip.lastIndexOf(":") + 1);
-        return `${getCurrentDateStr()} ${info.LEVEL} [${ip}] [${ctx.header.traceid} ${ctx.spanid}] [${ctx.path} ${ctx.method}] ${Date.now() - ctx.startTime}ms -- ${info.message}`;
+
+        return `${getCurrentDateStrSync()} ${info.LEVEL} [${ip}] [${ctx.header.traceid} ${ctx.spanid}] [${ctx.path} ${ctx.method}] ${Date.now() - ctx.startTime}ms -- ${info.message}`;
       }
     },
     // 跨域配置
@@ -67,7 +69,7 @@ export default (appInfo: MidwayAppInfo): MidwayConfig => {
       default: {
         level: "info",
         format: (info: LoggerInfo) => {
-          return `${getCurrentDateStr()} ${info.LEVEL} -- ${info.message}`;
+          return `${getCurrentDateStrSync()} ${info.LEVEL} -- ${info.message}`;
         },
         contextLoggerFormat: {},
         transports: {
@@ -162,7 +164,7 @@ export default (appInfo: MidwayAppInfo): MidwayConfig => {
       },
       contextLoggerFormat: info => {
         const { jobId, from } = info.ctx;
-        return `${getCurrentDateStr()} ${info.LEVEL} [${jobId} ${from.name}] -- ${info.message}`;
+        return `${getCurrentDateStrSync()} ${info.LEVEL} [${jobId} ${from.name}] -- ${info.message}`;
       }
     },
     // grpc
