@@ -3,6 +3,7 @@ import { BalancerService } from "@midwayjs/consul";
 import { Context } from "@midwayjs/koa";
 import * as Consul from "consul";
 import { HttpService, HttpServiceFactory } from "@midwayjs/axios";
+import { buildChildTraceId } from "../interface";
 
 @Controller()
 export class ConsulController {
@@ -112,7 +113,8 @@ export class ConsulController {
     let url: string = "http://" + serviceAddress + ":" + servicePort + "/api/typeorm/getTest1?page=1&size=10";
     this.ctx.logger.info("url: %s", url);
 
-    let result = await this.apiAxios.get(url);
+    let childHeader = await buildChildTraceId(this.ctx);
+    let result = await this.apiAxios.get(url, { headers: childHeader });
     if (result.status === HttpStatus.OK.valueOf()) {
       return result.data;
     } else {

@@ -5,6 +5,7 @@ import { APIController } from "../controller/api.controller";
 import { TestController } from "../controller/test.controller";
 import { TronController } from "../controller/tron.controller";
 import { ConsulController } from "../controller/consul.controller";
+import { getRandomNumber, getRandomUUID } from "../interface";
 
 @Aspect([APIController, TestController, TronController, ConsulController])
 export class LogAspect implements IMethodAspect {
@@ -20,6 +21,13 @@ export class LogAspect implements IMethodAspect {
   async before(point: JoinPoint) {
     let ctx: Context = point.target.ctx;
     if (ctx) {
+      if (!ctx.request.header.traceid) {
+        ctx.request.header.traceid = await getRandomUUID();
+      }
+      if (!ctx.spanid) {
+        ctx.spanid = await getRandomNumber();
+      }
+
       if (["GET", "get"].includes(ctx.method)) {
         ctx.logger.info("params: %j", ctx.request.querystring);
       } else if (["POST", "post"].includes(ctx.method)) {
@@ -41,6 +49,10 @@ export class LogAspect implements IMethodAspect {
       ctx.logger.debug("result: %j", result);
     }
 
+    if (result && result.success) {
+      return result;
+    }
+
     let res = { success: true, message: "成功" };
     if (result === null || result === undefined) {
       return res;
@@ -49,5 +61,20 @@ export class LogAspect implements IMethodAspect {
       (res as any).result = result;
       return res;
     }
+  }
+
+  /**
+   * 最后
+   * @param point
+   * @param result
+   * @param error
+   */
+  async after(point: JoinPoint, result: any, error: Error) {
+    let ctx: Context = point.target.ctx;
+    if (ctx) {
+      ctx.request.header.traceid = "";
+      ctx.spanid = "";
+    }
+
   }
 }
