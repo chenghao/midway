@@ -110,7 +110,8 @@ export class ConsulController {
     let serviceAddress: string = service.ServiceAddress;
     let servicePort: string = service.ServicePort;
 
-    let url: string = "http://" + serviceAddress + ":" + servicePort + "/api/typeorm/getTest1?page=1&size=10";
+    let url: string = "http://" + serviceAddress + ":" + servicePort;
+    url += "/api/typeorm/getTest1?page=1&size=10&startDate=2024-01-01&endDate=2024-01-30";
     this.ctx.logger.info("url: %s", url);
 
     let childHeader = await buildChildTraceId(this.ctx);
