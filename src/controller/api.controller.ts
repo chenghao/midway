@@ -57,8 +57,8 @@ export class APIController {
   @Get("/typeorm/getTest1")
   async getTest1(@Query("page") page: number = 1,
                  @Query("size") size: number = 10,
-                 @Query("startDate") startDate: string,
-                 @Query("endDate") endDate: string,
+                 @Query("startDate") startDate?: string,
+                 @Query("endDate") endDate?: string,
                  @Query("id") id?: number) {
     return await this.test1Service.getTest1Page(page, size, startDate, endDate, id);
   }

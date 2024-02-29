@@ -14,14 +14,18 @@ export class Test1Service {
   @Inject()
   ctx: Context;
 
-  async getTest1Page(page: number, size: number, startDate: string, endDate: string, id?: number) {
+  async getTest1Page(page: number, size: number, startDate?: string, endDate?: string, id?: number) {
     // await this.test1Repository.findAndCount({});
 
     let builder: SelectQueryBuilder<Test1Entity> = this.test1Repository.createQueryBuilder("test1")
       .skip((page - 1) * size)
-      .take(size)
-      .where("test1.create_time >= :startDate and test1.create_time <= :endDate")
-      .setParameters({ startDate: startDate, endDate: endDate });
+      .take(size);
+    if (startDate) {
+      builder.andWhere("test1.create_time >= :startDate").setParameters({ startDate: startDate });
+    }
+    if (endDate) {
+      builder.andWhere("test1.create_time <= :endDate").setParameters({ endDate: endDate });
+    }
     if (id) {
       builder
         .andWhere("test1.id=:id")

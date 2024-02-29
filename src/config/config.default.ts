@@ -64,6 +64,32 @@ export default (appInfo: MidwayAppInfo): MidwayConfig => {
       // 多个数据源时可以用这个指定默认的数据源
       defaultDataSourceName: "testDataSource"
     },
+    // sequelize
+    sequelize: {
+      dataSource: {
+        // 第一个数据源，数据源的名字可以完全自定义
+        testDataSource: {
+          database: "test",
+          username: "root",
+          password: "123456",
+          host: "192.168.1.55",
+          port: 3306,
+          dialect: "mysql",
+          define: { charset: "utf8mb4" },
+          timezone: "+08:00",
+          dialectOptions: {
+            dateStrings: true,
+            typeCast: true
+          },
+          entities: ["**/sequelize_entity/*.entity{.ts,.js}"],
+          repositoryMode: true,
+          // 本地的时候，可以通过 sync: true 直接 createTable
+          sync: false
+        }
+      },
+      // 多个数据源时可以用这个指定默认的数据源
+      defaultDataSourceName: "testDataSource"
+    },
     // 日志
     midwayLogger: {
       default: {
