@@ -2,6 +2,7 @@ import { MidwayAppInfo, MidwayConfig } from "@midwayjs/core";
 import { join } from "path";
 import { LoggerInfo } from "@midwayjs/logger";
 import { getCurrentDateStrSync } from "../interface";
+import { MySqlDriver } from "@mikro-orm/mysql";
 
 export default (appInfo: MidwayAppInfo): MidwayConfig => {
   return {
@@ -75,16 +76,50 @@ export default (appInfo: MidwayAppInfo): MidwayConfig => {
           host: "192.168.1.55",
           port: 3306,
           dialect: "mysql",
-          define: { charset: "utf8mb4" },
+          define: {
+            charset: "utf8mb4",
+            // 默认情况下, Sequelize 使用数据类型 DataTypes.DATE 自动向每个模型添加 createdAt 和 updatedAt 字段. 这些字段会自动进行管理
+            // 每当你使用Sequelize 创建或更新内容时, 这些字段都会被自动设置.
+            // createdAt 字段将包含代表创建时刻的时间戳,
+            // updatedAt 字段将包含最新更新的时间戳.
+            // 对于带有 timestamps: false 参数的模型,可以禁用此行为，调用数据库自带的创建时间和更新时间
+            timestamps: false,
+            // 不想要 createdAt
+            createdAt: false,
+            // 不想要 updatedAt
+            updatedAt: false
+          },
           timezone: "+08:00",
           dialectOptions: {
             dateStrings: true,
             typeCast: true
           },
+          logging: true,
           entities: ["**/sequelize_entity/*.entity{.ts,.js}"],
           repositoryMode: true,
           // 本地的时候，可以通过 sync: true 直接 createTable
           sync: false
+        }
+      },
+      // 多个数据源时可以用这个指定默认的数据源
+      defaultDataSourceName: "testDataSource"
+    },
+    // mikro
+    mikro: {
+      dataSource: {
+        testDataSource: {
+          host: "192.168.1.55",
+          port: 3306,
+          user: "root",
+          password: "123456",
+          charset: "utf8mb4",
+          timezone: "+08:00",
+          entities: ["**/mikro_entity/*.entity{.ts,.js}"],
+          dbName: "test",
+          debug: true,
+          persistOnCreate: true,
+          driver: MySqlDriver,     // 这里使用了 sqlite 做示例
+          allowGlobalContext: true
         }
       },
       // 多个数据源时可以用这个指定默认的数据源

@@ -6,6 +6,7 @@ import * as info from "@midwayjs/info";
 import * as crossDomain from "@midwayjs/cross-domain";
 import * as typeorm from "@midwayjs/typeorm";
 import * as sequelize from "@midwayjs/sequelize";
+import * as mikro from "@midwayjs/mikro";
 import * as redis from "@midwayjs/redis";
 import * as prometheus from "@midwayjs/prometheus";
 import * as axios from "@midwayjs/axios";
@@ -27,6 +28,7 @@ import { ValidateErrorFilter } from "./filter/validate.filter";
     crossDomain,
     typeorm,
     sequelize,
+    mikro,
     redis,
     prometheus,
     axios,
