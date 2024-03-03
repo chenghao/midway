@@ -1,6 +1,6 @@
 import { IProcessor, Processor } from "@midwayjs/bull";
 import { Inject } from "@midwayjs/core";
-import { Context } from "@midwayjs/koa";
+import { ILogger } from "@midwayjs/logger";
 
 /**
  * 任务队列执行器，队列名称 test
@@ -15,9 +15,9 @@ import { Context } from "@midwayjs/koa";
 )
 export class TestProcessor implements IProcessor {
   @Inject()
-  ctx: Context;
+  logger: ILogger;
 
   async execute(data: any) {
-    this.ctx.logger.info(data);
+    this.logger.info("data: %j", data);
   }
 }

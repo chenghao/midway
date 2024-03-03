@@ -1,6 +1,8 @@
 import { MidwayAppInfo, MidwayConfig } from "@midwayjs/core";
 import { join } from "path";
-
+import { LoggerInfo } from "@midwayjs/logger";
+import { getCurrentDateStrSync } from "../interface";
+import { MySqlDriver } from "@mikro-orm/mysql";
 
 export default (appInfo: MidwayAppInfo): MidwayConfig => {
   return {
@@ -10,7 +12,11 @@ export default (appInfo: MidwayAppInfo): MidwayConfig => {
       //自定义配置上下文日志
       contextLoggerFormat: info => {
         const ctx = info.ctx;
-        return `${info.timestamp} ${info.LEVEL} [${ctx.ip}] [${ctx.path} ${ctx.method}] ${Date.now() - ctx.startTime}ms -- ${info.message}`;
+        // 处理ip, 只取ip4
+        let ip = ctx.ip;
+        ip = ip.substring(ip.lastIndexOf(":") + 1);
+
+        return `${getCurrentDateStrSync()} ${info.LEVEL} [${ip}] [${ctx.header.traceid} ${ctx.spanid}] [${ctx.path} ${ctx.method}] ${Date.now() - ctx.startTime}ms -- ${info.message}`;
       }
     },
     // 跨域配置
@@ -59,10 +65,74 @@ export default (appInfo: MidwayAppInfo): MidwayConfig => {
       // 多个数据源时可以用这个指定默认的数据源
       defaultDataSourceName: "testDataSource"
     },
+    // sequelize
+    sequelize: {
+      dataSource: {
+        // 第一个数据源，数据源的名字可以完全自定义
+        testDataSource: {
+          database: "test",
+          username: "root",
+          password: "123456",
+          host: "192.168.1.55",
+          port: 3306,
+          dialect: "mysql",
+          define: {
+            charset: "utf8mb4",
+            // 默认情况下, Sequelize 使用数据类型 DataTypes.DATE 自动向每个模型添加 createdAt 和 updatedAt 字段. 这些字段会自动进行管理
+            // 每当你使用Sequelize 创建或更新内容时, 这些字段都会被自动设置.
+            // createdAt 字段将包含代表创建时刻的时间戳,
+            // updatedAt 字段将包含最新更新的时间戳.
+            // 对于带有 timestamps: false 参数的模型,可以禁用此行为，调用数据库自带的创建时间和更新时间
+            timestamps: false,
+            // 不想要 createdAt
+            createdAt: false,
+            // 不想要 updatedAt
+            updatedAt: false
+          },
+          timezone: "+08:00",
+          dialectOptions: {
+            dateStrings: true,
+            typeCast: true
+          },
+          logging: true,
+          entities: ["**/sequelize_entity/*.entity{.ts,.js}"],
+          repositoryMode: true,
+          // 本地的时候，可以通过 sync: true 直接 createTable
+          sync: false
+        }
+      },
+      // 多个数据源时可以用这个指定默认的数据源
+      defaultDataSourceName: "testDataSource"
+    },
+    // mikro
+    mikro: {
+      dataSource: {
+        testDataSource: {
+          host: "192.168.1.55",
+          port: 3306,
+          user: "root",
+          password: "123456",
+          charset: "utf8mb4",
+          timezone: "+08:00",
+          entities: ["**/mikro_entity/*.entity{.ts,.js}"],
+          dbName: "test",
+          debug: true,
+          persistOnCreate: true,
+          driver: MySqlDriver,     // 这里使用了 sqlite 做示例
+          allowGlobalContext: true
+        }
+      },
+      // 多个数据源时可以用这个指定默认的数据源
+      defaultDataSourceName: "testDataSource"
+    },
     // 日志
     midwayLogger: {
       default: {
         level: "info",
+        format: (info: LoggerInfo) => {
+          return `${getCurrentDateStrSync()} ${info.LEVEL} -- ${info.message}`;
+        },
+        contextLoggerFormat: {},
         transports: {
           file: {
             dir: `/home/logs/midway-demo`,
@@ -110,13 +180,17 @@ export default (appInfo: MidwayAppInfo): MidwayConfig => {
     },
     // http请求
     axios: {
+      default: {
+        // 所有实例复用的配置
+        timeout: 3000, // default is `0` (no timeout)
+        // `withCredentials` indicates whether or not cross-site Access-Control requests
+        // should be made using credentials
+        withCredentials: false // default
+      },
       clients: {
         default: {
-          timeout: 3000, // default is `0` (no timeout)
-
-          // `withCredentials` indicates whether or not cross-site Access-Control requests
-          // should be made using credentials
-          withCredentials: false // default
+          // `headers` are custom headers to be sent
+          headers: {}
         },
         // 自定义实例，可以配置多个
         tronAxios: {
@@ -148,18 +222,50 @@ export default (appInfo: MidwayAppInfo): MidwayConfig => {
           commandTimeout: 10000,
           connectTimeout: 10000
         }
+      },
+      contextLoggerFormat: info => {
+        const { jobId, from } = info.ctx;
+        return `${getCurrentDateStrSync()} ${info.LEVEL} [${jobId} ${from.name}] -- ${info.message}`;
       }
     },
     // grpc
     grpcServer: {
       // 定义grpc的请求地址和端口
-      url: "192.168.1.3:7701",
+      url: "192.168.1.55:7701",
       services: [
         {
           protoPath: join(appInfo.appDir, "proto/demo.proto"),
           package: "protocol"
         }
       ]
+    },
+    // consul
+    consul: {
+      provider: {
+        // 注册本服务
+        register: true,
+        // 应用正常下线反注册
+        deregister: true,
+        // consul server 服务地址
+        host: "192.168.1.55",
+        // consul server 服务端口
+        port: "8500",
+        // 调用服务的策略(默认选取 random 具有随机性)
+        strategy: "random"
+      },
+      service: {
+        // 项目注册到consul的id，默认是 name:address:port
+        // id: "",
+        // 此处是当前这个 midway 应用的地址
+        address: "192.168.1.55",
+        // 当前 midway 应用的端口
+        port: 7001,
+        // 做泳道隔离等使用
+        tags: ["tag1", "tag2"],
+        // 名称
+        name: "midway-demo"
+        // others consul service definition
+      }
     }
   };
 }

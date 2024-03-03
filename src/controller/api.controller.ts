@@ -45,20 +45,22 @@ export class APIController {
     const pickTestReq: PickTestReq = new PickTestReq();
     pickTestReq.firstName = "aaa";
     pickTestReq.lastName = "bbb";
-    this.ctx.logger.info(`pickTestReq: ${JSON.stringify(pickTestReq)}`);
+    this.ctx.logger.info("pickTestReq: %j", pickTestReq);
 
     const omitTestReq: OmitTestReq = new OmitTestReq();
     omitTestReq.id = 2;
     omitTestReq.firstName = "sss";
     omitTestReq.lastName = "wsx";
-    this.ctx.logger.info(`omitTestReq: ${JSON.stringify(omitTestReq)}`);
+    this.ctx.logger.info("omitTestReq: %j", omitTestReq);
   }
 
   @Get("/typeorm/getTest1")
-  async getTest1(@Query("page") page: number,
-                 @Query("size") size: number,
+  async getTest1(@Query("page") page: number = 1,
+                 @Query("size") size: number = 10,
+                 @Query("startDate") startDate?: string,
+                 @Query("endDate") endDate?: string,
                  @Query("id") id?: number) {
-    return await this.test1Service.getTest1Page(page, size, id);
+    return await this.test1Service.getTest1Page(page, size, startDate, endDate, id);
   }
 
   @Post("/typeorm/addTest1")

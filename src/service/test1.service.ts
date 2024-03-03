@@ -14,19 +14,24 @@ export class Test1Service {
   @Inject()
   ctx: Context;
 
-  async getTest1Page(page: number, size: number, id?: number) {
+  async getTest1Page(page: number, size: number, startDate?: string, endDate?: string, id?: number) {
     // await this.test1Repository.findAndCount({});
 
     let builder: SelectQueryBuilder<Test1Entity> = this.test1Repository.createQueryBuilder("test1")
       .skip((page - 1) * size)
-      .take(size)
-      .orderBy("test1.id", "DESC")
-      .printSql();
+      .take(size);
+    if (startDate) {
+      builder.andWhere("test1.create_time >= :startDate").setParameters({ startDate: startDate });
+    }
+    if (endDate) {
+      builder.andWhere("test1.create_time <= :endDate").setParameters({ endDate: endDate });
+    }
     if (id) {
       builder
-        .where("test1.id=:id")
+        .andWhere("test1.id=:id")
         .setParameters({ id: id });
     }
+    builder.orderBy("test1.id", "DESC");
 
     let [data, total] = await builder.getManyAndCount();
 

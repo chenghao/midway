@@ -1,6 +1,7 @@
-import { HttpStatus, Inject, InjectClient, Provide } from "@midwayjs/core";
+import { HttpStatus, Inject, InjectClient, MidwayError, Provide } from "@midwayjs/core";
 import { HttpService, HttpServiceFactory } from "@midwayjs/axios";
 import { Context } from "@midwayjs/koa";
+import { buildChildTraceId } from "../interface";
 
 @Provide()
 export class TronService {
@@ -11,12 +12,13 @@ export class TronService {
   tronAxios: HttpService;
 
   async getBlockTransactionReq(txId: string) {
-    let result = await this.tronAxios.post("/walletsolidity/gettransactionbyid", { value: txId });
+    let childHeader = await buildChildTraceId(this.ctx);
+    let result = await this.tronAxios.post("/walletsolidity/gettransactionbyid", { value: txId }, { headers: childHeader });
 
     if (result.status === HttpStatus.OK.valueOf()) {
       return result.data;
     } else {
-      new Error("请求失败");
+      throw new MidwayError("请求失败");
     }
   }
 }
