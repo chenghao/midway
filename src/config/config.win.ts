@@ -30,6 +30,25 @@ export default (appInfo: MidwayAppInfo): MidwayConfig => {
         // 更多的数据源配置
       }
     },
+    sequelize: {
+      dataSource: {
+        // 自定义数据源名称
+        testDataSource: {
+          host: "192.168.0.106",
+          timezone: "+08:00",
+        }
+        // 更多的数据源配置
+      }
+    },
+    mikro: {
+      dataSource: {
+        // 自定义数据源名称
+        testDataSource: {
+          host: "192.168.0.106",
+        }
+        // 更多的数据源配置
+      }
+    },
     // redis
     redis: {
       clients: {
@@ -56,7 +75,25 @@ export default (appInfo: MidwayAppInfo): MidwayConfig => {
     // grpc
     grpcServer: {
       // 定义grpc的请求地址和端口
-      url: "192.168.0.108:7701",
+      url: "192.168.0.103:7001",
+    },
+    // consul
+    consul: {
+      provider: {
+        // consul server 服务地址
+        host: "192.168.0.106",
+      },
+      service: {
+        // 项目注册到consul的id，默认是 name:address:port
+        // id: "",
+        // 此处是当前这个 midway 应用的地址
+        address: "192.168.0.106",
+        // 当前 midway 应用的端口
+        port: 7001,
+        // 名称
+        name: "midway-demo"
+        // others consul service definition
+      }
     }
   };
 }
