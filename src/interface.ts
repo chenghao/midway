@@ -11,8 +11,8 @@ dayjs.extend(timezone);
  * 获取随机数， uuid
  */
 export async function getRandomUUID() {
-  let uuid = randomUUID();
-  return uuid.replaceAll("-", "");
+    let uuid = randomUUID();
+    return uuid.replaceAll("-", "");
 }
 
 /**
@@ -21,9 +21,9 @@ export async function getRandomUUID() {
  * @param max
  */
 export async function getRandomNumber(min?: number, max?: number) {
-  const range = max - min; // 取值范围差
-  const random = Math.random(); // 小于1的随机数
-  return min + Math.round(random * range); // 最小数加随机范围差
+    const range = max - min; // 取值范围差
+    const random = Math.random(); // 小于1的随机数
+    return min + Math.round(random * range); // 最小数加随机范围差
 }
 
 /**
@@ -32,13 +32,13 @@ export async function getRandomNumber(min?: number, max?: number) {
  * @param max
  */
 export async function getTraceId(min?: number, max?: number) {
-  if (!min) {
-    min = 1000000000;
-  }
-  if (!max) {
-    max = 9999999999;
-  }
-  return getRandomNumber(min, max);
+    if (!min) {
+        min = 1000000000;
+    }
+    if (!max) {
+        max = 9999999999;
+    }
+    return getRandomNumber(min, max);
 }
 
 /**
@@ -47,13 +47,13 @@ export async function getTraceId(min?: number, max?: number) {
  * @param max
  */
 export async function getSpanId(min?: number, max?: number) {
-  if (!min) {
-    min = 100000;
-  }
-  if (!max) {
-    max = 999999;
-  }
-  return getRandomNumber(min, max);
+    if (!min) {
+        min = 100000;
+    }
+    if (!max) {
+        max = 999999;
+    }
+    return getRandomNumber(min, max);
 }
 
 /**
@@ -61,11 +61,11 @@ export async function getSpanId(min?: number, max?: number) {
  * 格式化后的日期
  */
 export async function getCurrentDateStr() {
-  return dayjs().tz("Asia/Shanghai").format("YYYY-MM-DD HH:mm:ss.SSS");
+    return dayjs().tz("Asia/Shanghai").format("YYYY-MM-DD HH:mm:ss.SSS");
 }
 
 export function getCurrentDateStrSync() {
-  return dayjs().tz("Asia/Shanghai").format("YYYY-MM-DD HH:mm:ss.SSS");
+    return dayjs().tz("Asia/Shanghai").format("YYYY-MM-DD HH:mm:ss.SSS");
 }
 
 /**
@@ -73,23 +73,23 @@ export function getCurrentDateStrSync() {
  * @param ms
  */
 export async function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export async function buildChildTraceId(ctx: Context) {
-  let header = ctx.request.header;
-  if (header) {
-    let traceid = header.traceid;
-    if (traceid) {
-      return { traceid: traceid };
+    let header = ctx.request.header;
+    if (header) {
+        let traceid = header.traceid;
+        if (traceid) {
+            return { traceid: traceid };
+        }
     }
-  }
-  return {};
+    return {};
 }
 
 /**
  * @description User-Service parameters
  */
 export interface IUserOptions {
-  uid: number;
+    uid: number;
 }

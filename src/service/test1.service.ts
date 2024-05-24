@@ -7,47 +7,46 @@ import { Context } from "@midwayjs/koa";
 
 @Provide()
 export class Test1Service {
-  // 指定使用哪个数据库， test就是在config.default.ts下的typeorm配置
-  @InjectEntityModel(Test1Entity, "testDataSource")
-  test1Repository: Repository<Test1Entity>;
+    // 指定使用哪个数据库， test就是在config.default.ts下的typeorm配置
+    @InjectEntityModel(Test1Entity, "testDataSource")
+    test1Repository: Repository<Test1Entity>;
 
-  @Inject()
-  ctx: Context;
+    @Inject()
+    ctx: Context;
 
-  async getTest1Page(page: number, size: number, startDate?: string, endDate?: string, id?: number) {
-    // await this.test1Repository.findAndCount({});
+    async getTest1Page(page: number, size: number, startDate?: string, endDate?: string, id?: number) {
+        // await this.test1Repository.findAndCount({});
 
-    let builder: SelectQueryBuilder<Test1Entity> = this.test1Repository.createQueryBuilder("test1")
-      .skip((page - 1) * size)
-      .take(size);
-    if (startDate) {
-      builder.andWhere("test1.create_time >= :startDate").setParameters({ startDate: startDate });
+        let builder: SelectQueryBuilder<Test1Entity> = this.test1Repository
+            .createQueryBuilder("test1")
+            .skip((page - 1) * size)
+            .take(size);
+        if (startDate) {
+            builder.andWhere("test1.create_time >= :startDate").setParameters({ startDate: startDate });
+        }
+        if (endDate) {
+            builder.andWhere("test1.create_time <= :endDate").setParameters({ endDate: endDate });
+        }
+        if (id) {
+            builder.andWhere("test1.id=:id").setParameters({ id: id });
+        }
+        builder.orderBy("test1.id", "DESC");
+
+        let [data, total] = await builder.getManyAndCount();
+
+        return {
+            data,
+            total,
+            page,
+            size,
+        };
     }
-    if (endDate) {
-      builder.andWhere("test1.create_time <= :endDate").setParameters({ endDate: endDate });
+
+    async addTest1(name: string) {
+        let test1Entity: Test1Entity = new Test1Entity();
+        test1Entity.name = name;
+
+        const result = await this.test1Repository.save(test1Entity);
+        return result.id;
     }
-    if (id) {
-      builder
-        .andWhere("test1.id=:id")
-        .setParameters({ id: id });
-    }
-    builder.orderBy("test1.id", "DESC");
-
-    let [data, total] = await builder.getManyAndCount();
-
-    return {
-      data,
-      total,
-      page,
-      size
-    };
-  }
-
-  async addTest1(name: string) {
-    let test1Entity: Test1Entity = new Test1Entity();
-    test1Entity.name = name;
-
-    const result = await this.test1Repository.save(test1Entity);
-    return result.id;
-  }
 }

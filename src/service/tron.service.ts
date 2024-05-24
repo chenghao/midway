@@ -5,20 +5,20 @@ import { buildChildTraceId } from "../interface";
 
 @Provide()
 export class TronService {
-  @Inject()
-  ctx: Context;
+    @Inject()
+    ctx: Context;
 
-  @InjectClient(HttpServiceFactory, "tronAxios")
-  tronAxios: HttpService;
+    @InjectClient(HttpServiceFactory, "tronAxios")
+    tronAxios: HttpService;
 
-  async getBlockTransactionReq(txId: string) {
-    let childHeader = await buildChildTraceId(this.ctx);
-    let result = await this.tronAxios.post("/walletsolidity/gettransactionbyid", { value: txId }, { headers: childHeader });
+    async getBlockTransactionReq(txId: string) {
+        let childHeader = await buildChildTraceId(this.ctx);
+        let result = await this.tronAxios.post("/walletsolidity/gettransactionbyid", { value: txId }, { headers: childHeader });
 
-    if (result.status === HttpStatus.OK.valueOf()) {
-      return result.data;
-    } else {
-      throw new MidwayError("请求失败");
+        if (result.status === HttpStatus.OK.valueOf()) {
+            return result.data;
+        } else {
+            throw new MidwayError("请求失败");
+        }
     }
-  }
 }
