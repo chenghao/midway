@@ -46,6 +46,7 @@
     "start": "NODE_ENV=production node ./bootstrap.js",
     "dev": "cross-env NODE_ENV=local mwtsc --watch --run @midwayjs/mock/app.js",
     "devMac": "cross-env NODE_ENV=macos mwtsc --watch --run @midwayjs/mock/app.js",
+    "devWin": "cross-env NODE_ENV=win mwtsc --watch --run @midwayjs/mock/app.js",
     "test": "cross-env NODE_ENV=unittest jest",
     "build": "mwtsc --cleanOutDir",
     "generate": "tsproto --path proto --output src/domain",
